@@ -1,0 +1,27 @@
+# Ignore training data to keep Vercel bundle slim & fast
+backend/data/
+data/
+
+# Ignore uploads and local temp files
+backend/uploads/
+uploads/
+*.wav
+*.mp3
+*.webm
+*.ogg
+
+# Ignore training script & dev scripts
+backend/train_model.py
+train_model.py
+
+# Python cache & virtual environments
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.git/
+.gitignore
+.DS_Store

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Deepfake Voice Detection — AI-powered tool to detect synthetic and cloned voices in real-time using advanced audio analysis.">
+    <title>DeepVoice Shield — AI Deepfake Voice Detector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- Particle Background -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">
+            <div class="brand-icon">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <path d="M14 2L26 8V20L14 26L2 20V8L14 2Z" stroke="url(#navGrad)" stroke-width="2" fill="none"/>
+                    <path d="M14 8C16.5 8 19 10 19 14C19 18 16.5 20 14 20C11.5 20 9 18 9 14C9 10 11.5 8 14 8Z" fill="url(#navGrad)" opacity="0.6"/>
+                    <circle cx="14" cy="14" r="3" fill="url(#navGrad)"/>
+                    <defs>
+                        <linearGradient id="navGrad" x1="2" y1="2" x2="26" y2="26">
+                            <stop offset="0%" stop-color="#00f0ff"/>
+                            <stop offset="100%" stop-color="#7c3aed"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <span class="brand-text">DeepVoice<span class="brand-accent">Shield</span></span>
+        </div>
+        <div class="nav-links">
+            <a href="#detect" class="nav-link">Detect</a>
+            <a href="#how-it-works" class="nav-link">How It Works</a>
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#faq" class="nav-link">FAQ</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                AI-Powered Voice Analysis
+            </div>
+            <h1 class="hero-title">
+                Detect <span class="gradient-text">Deepfake</span> Voices<br>
+                in Seconds
+            </h1>
+            <p class="hero-subtitle">
+                Our advanced AI analyzes vocal patterns, spectral fingerprints, and acoustic features 
+                to distinguish real human voices from synthetic deepfakes with high accuracy.
+            </p>
+            <div class="hero-actions">
+                <a href="#detect" class="btn btn-primary" id="heroStartBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="23"/>
+                        <line x1="8" y1="23" x2="16" y2="23"/>
+                    </svg>
+                    Start Detection
+                </a>
+                <a href="#how-it-works" class="btn btn-ghost">
+                    Learn More
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M7 17l9.2-9.2M17 17V7.8H7.8"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-value">131</span>
+                    <span class="stat-label">Audio Features</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <span class="stat-value">6+</span>
+                    <span class="stat-label">Feature Categories</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <span class="stat-value">&lt;3s</span>
+                    <span class="stat-label">Analysis Time</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="sound-wave-container">
+                <canvas id="heroWaveCanvas" width="500" height="200"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detection Section -->
+    <section class="detect-section" id="detect">
+        <div class="section-header">
+            <span class="section-tag">Voice Analysis</span>
+            <h2 class="section-title">Record & Detect</h2>
+            <p class="section-desc">Click the microphone to record your voice. Our AI will analyze it in real-time.</p>
+        </div>
+
+        <div class="detect-container">
+            <!-- Mode Selection Tabs -->
+            <div class="detect-tabs">
+                <button class="detect-tab active" id="tabRecord">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    </svg>
+                    Live Microphone
+                </button>
+                <button class="detect-tab" id="tabUpload">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    Upload Audio File
+                </button>
+            </div>
+
+            <!-- Recording Card -->
+            <div class="record-card glass-card" id="recordCard">
+                <div class="record-status" id="recordStatus">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span id="statusText">Ready to record</span>
+                </div>
+
+                <!-- Record Mode Container -->
+                <div id="recordModeContainer">
+                    <!-- Waveform Visualizer -->
+                    <div class="waveform-container" id="waveformContainer">
+                        <canvas id="waveformCanvas"></canvas>
+                    </div>
+
+                    <!-- Mic Button -->
+                    <div class="mic-button-wrapper">
+                        <div class="mic-ripple" id="micRipple"></div>
+                        <button class="mic-button" id="micButton" aria-label="Record voice">
+                            <svg class="mic-icon" id="micIcon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                                <line x1="8" y1="23" x2="16" y2="23"/>
+                            </svg>
+                            <svg class="stop-icon hidden" id="stopIcon" width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+                                <rect x="6" y="6" width="12" height="12" rx="2"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Timer -->
+                    <div class="record-timer" id="recordTimer">
+                        <span id="timerDisplay">00:00</span>
+                        <span class="timer-hint">3-10 seconds recommended</span>
+                    </div>
+                </div>
+
+                <!-- Upload Mode Container -->
+                <div id="uploadModeContainer" class="hidden">
+                    <div class="dropzone" id="audioDropzone">
+                        <input type="file" id="audioFileInput" accept="audio/*" class="file-input-hidden">
+                        <div class="dropzone-content">
+                            <div class="dropzone-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M9 18V5l12-2v13"/>
+                                    <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+                                </svg>
+                            </div>
+                            <p class="dropzone-main-text">Drag & drop audio file here or <span class="browse-link">browse</span></p>
+                            <p class="dropzone-sub-text">Supports MP3, WAV, FLAC, M4A, OGG</p>
+                        </div>
+                    </div>
+                    <div id="selectedFileInfo" class="selected-file-info hidden">
+                        <span id="selectedFileName">file.wav</span>
+                        <button class="btn btn-primary btn-sm" id="btnAnalyzeFile">Analyze Audio</button>
+                    </div>
+                </div>
+
+                <!-- Analyzing State -->
+                <div class="analyzing-state hidden" id="analyzingState">
+                    <div class="analyzing-spinner">
+                        <div class="spinner-ring"></div>
+                        <div class="spinner-ring"></div>
+                        <div class="spinner-ring"></div>
+                    </div>
+                    <p class="analyzing-text">Analyzing voice patterns...</p>
+                    <div class="analyzing-steps">
+                        <div class="step-item" id="step1">
+                            <div class="step-check"></div>
+                            <span>Extracting audio features</span>
+                        </div>
+                        <div class="step-item" id="step2">
+                            <div class="step-check"></div>
+                            <span>Analyzing spectral patterns</span>
+                        </div>
+                        <div class="step-item" id="step3">
+                            <div class="step-check"></div>
+                            <span>Running AI classifier</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Card -->
+            <div class="results-card glass-card hidden" id="resultsCard">
+                <div class="results-header">
+                    <h3>Analysis Results</h3>
+                    <button class="btn-reset" id="resetBtn" aria-label="New detection">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                        </svg>
+                        New Scan
+                    </button>
+                </div>
+
+                <!-- Verdict -->
+                <div class="verdict-container" id="verdictContainer">
+                    <div class="confidence-gauge" id="confidenceGauge">
+                        <svg viewBox="0 0 200 200" class="gauge-svg">
+                            <circle cx="100" cy="100" r="85" class="gauge-bg"/>
+                            <circle cx="100" cy="100" r="85" class="gauge-fill" id="gaugeFill"
+                                    stroke-dasharray="534" stroke-dashoffset="534"/>
+                        </svg>
+                        <div class="gauge-center">
+                            <span class="gauge-value" id="gaugeValue">0</span>
+                            <span class="gauge-unit">%</span>
+                            <span class="gauge-label">Confidence</span>
+                        </div>
+                    </div>
+                    <div class="verdict-label" id="verdictLabel">—</div>
+                    <p class="verdict-desc" id="verdictDesc"></p>
+                </div>
+
+                <!-- Probability Bars -->
+                <div class="probability-bars">
+                    <div class="prob-bar-row">
+                        <span class="prob-label real-label">Real Voice</span>
+                        <div class="prob-track">
+                            <div class="prob-fill real-fill" id="realBar" style="width: 0%"></div>
+                        </div>
+                        <span class="prob-value" id="realValue">0%</span>
+                    </div>
+                    <div class="prob-bar-row">
+                        <span class="prob-label fake-label">Fake Voice</span>
+                        <div class="prob-track">
+                            <div class="prob-fill fake-fill" id="fakeBar" style="width: 0%"></div>
+                        </div>
+                        <span class="prob-value" id="fakeValue">0%</span>
+                    </div>
+                </div>
+
+                <!-- Feature Breakdown -->
+                <div class="feature-breakdown" id="featureBreakdown">
+                    <h4 class="breakdown-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                        Features Analyzed
+                    </h4>
+                    <div class="feature-grid" id="featureGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-section" id="how-it-works">
+        <div class="section-header">
+            <span class="section-tag">Process</span>
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-desc">Three simple steps to detect deepfake voices</p>
+        </div>
+
+        <div class="steps-container">
+            <div class="step-card glass-card">
+                <div class="step-number">01</div>
+                <div class="step-icon-wrap">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="url(#stepGrad1)" stroke-width="1.5">
+                        <defs>
+                            <linearGradient id="stepGrad1" x1="0" y1="0" x2="24" y2="24">
+                                <stop offset="0%" stop-color="#00f0ff"/>
+                                <stop offset="100%" stop-color="#7c3aed"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="23"/>
+                        <line x1="8" y1="23" x2="16" y2="23"/>
+                    </svg>
+                </div>
+                <h3 class="step-title">Record</h3>
+                <p class="step-desc">Click the microphone button and speak for 3-10 seconds. The app captures your voice in high quality.</p>
+            </div>
+
+            <div class="step-connector">
+                <svg width="60" height="24" viewBox="0 0 60 24">
+                    <path d="M0 12 H50 L45 6 M50 12 L45 18" stroke="#00f0ff" stroke-width="2" fill="none" opacity="0.4"/>
+                </svg>
+            </div>
+
+            <div class="step-card glass-card">
+                <div class="step-number">02</div>
+                <div class="step-icon-wrap">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="url(#stepGrad2)" stroke-width="1.5">
+                        <defs>
+                            <linearGradient id="stepGrad2" x1="0" y1="0" x2="24" y2="24">
+                                <stop offset="0%" stop-color="#00f0ff"/>
+                                <stop offset="100%" stop-color="#7c3aed"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9h18M9 21V9"/>
+                        <circle cx="15" cy="15" r="2"/>
+                    </svg>
+                </div>
+                <h3 class="step-title">Analyze</h3>
+                <p class="step-desc">Our AI extracts 131 audio features including MFCCs, spectral patterns, and vocal characteristics.</p>
+            </div>
+
+            <div class="step-connector">
+                <svg width="60" height="24" viewBox="0 0 60 24">
+                    <path d="M0 12 H50 L45 6 M50 12 L45 18" stroke="#00f0ff" stroke-width="2" fill="none" opacity="0.4"/>
+                </svg>
+            </div>
+
+            <div class="step-card glass-card">
+                <div class="step-number">03</div>
+                <div class="step-icon-wrap">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="url(#stepGrad3)" stroke-width="1.5">
+                        <defs>
+                            <linearGradient id="stepGrad3" x1="0" y1="0" x2="24" y2="24">
+                                <stop offset="0%" stop-color="#00f0ff"/>
+                                <stop offset="100%" stop-color="#7c3aed"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                </div>
+                <h3 class="step-title">Result</h3>
+                <p class="step-desc">Get an instant verdict — Real or Fake — with a confidence score and detailed feature breakdown.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <span class="section-tag">Technology</span>
+            <h2 class="section-title">What We Analyze</h2>
+            <p class="section-desc">Our AI examines multiple dimensions of audio to detect synthetic voices</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card glass-card">
+                <div class="feature-icon" style="--accent: #00f0ff">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M2 12h2l3-9 4 18 4-18 3 9h2"/>
+                    </svg>
+                </div>
+                <h3>MFCCs</h3>
+                <p>Mel-Frequency Cepstral Coefficients capture the timbral texture and vocal quality of the voice — the unique "fingerprint" of how someone sounds.</p>
+            </div>
+
+            <div class="feature-card glass-card">
+                <div class="feature-icon" style="--accent: #7c3aed">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                </div>
+                <h3>Spectral Centroid</h3>
+                <p>Measures the "brightness" of sound — where the center of mass of the frequency spectrum lies. Deepfakes often have unnatural brightness patterns.</p>
+            </div>
+
+            <div class="feature-card glass-card">
+                <div class="feature-icon" style="--accent: #10b981">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                </div>
+                <h3>Spectral Contrast</h3>
+                <p>Analyzes the difference between peaks and valleys in the frequency spectrum — synthetic voices often show unnatural smoothness.</p>
+            </div>
+
+            <div class="feature-card glass-card">
+                <div class="feature-icon" style="--accent: #f59e0b">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </div>
+                <h3>Zero Crossing Rate</h3>
+                <p>Tracks how often the audio signal crosses zero — helps distinguish between natural speech variations and synthetic artifacts.</p>
+            </div>
+
+            <div class="feature-card glass-card">
+                <div class="feature-icon" style="--accent: #ef4444">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                </div>
+                <h3>Chroma Features</h3>
+                <p>Captures the harmonic and pitch content of speech — natural voices have complex, dynamic harmonic patterns that are hard to replicate.</p>
+            </div>
+
+            <div class="feature-card glass-card">
+                <div class="feature-icon" style="--accent: #ec4899">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M9 18V5l12-2v13"/>
+                        <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+                    </svg>
+                </div>
+                <h3>RMS Energy</h3>
+                <p>Measures the loudness and energy dynamics over time — deepfakes often have unnaturally consistent or abrupt energy patterns.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section" id="faq">
+        <div class="section-header">
+            <span class="section-tag">Learn</span>
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-desc">Understanding deepfake voice detection</p>
+        </div>
+
+        <div class="faq-container">
+            <div class="faq-item glass-card" data-faq="1">
+                <button class="faq-question" id="faq1Btn">
+                    <span>What is a deepfake voice?</span>
+                    <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+                <div class="faq-answer">
+                    <p>A deepfake voice is a synthetic audio clip generated by AI/ML models that imitates a real person's voice. These are created using techniques like Text-to-Speech (TTS) synthesis, voice conversion, or voice cloning. Modern deepfake voices can sound remarkably realistic, making detection challenging.</p>
+                </div>
+            </div>
+
+            <div class="faq-item glass-card" data-faq="2">
+                <button class="faq-question" id="faq2Btn">
+                    <span>What are MFCCs and why are they important?</span>
+                    <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+                <div class="faq-answer">
+                    <p>MFCCs (Mel-Frequency Cepstral Coefficients) are a representation of the short-term power spectrum of sound. They mimic how the human ear perceives sound by using the mel scale. MFCCs capture the "timbral texture" of voice — essentially the unique quality that makes each person's voice sound different. Deepfake voices often have subtle MFCC anomalies that our AI can detect.</p>
+                </div>
+            </div>
+
+            <div class="faq-item glass-card" data-faq="3">
+                <button class="faq-question" id="faq3Btn">
+                    <span>How does the Random Forest classifier work?</span>
+                    <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+                <div class="faq-answer">
+                    <p>A Random Forest is an ensemble machine learning algorithm that creates hundreds of decision trees during training. Each tree votes on whether a voice is real or fake based on different audio features. The final prediction is determined by majority vote. This approach is robust because individual trees may make errors, but the collective "forest" averages out mistakes for better accuracy.</p>
+                </div>
+            </div>
+
+            <div class="faq-item glass-card" data-faq="4">
+                <button class="faq-question" id="faq4Btn">
+                    <span>How accurate is this system?</span>
+                    <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+                <div class="faq-answer">
+                    <p>Accuracy depends on the training data. With synthetic training data (demo mode), expect ~75-85% accuracy. When trained on real deepfake datasets like ASVspoof 2019, MFCC + Random Forest models can achieve 90-98% accuracy. The system is designed to be educational and can be improved by training on better datasets.</p>
+                </div>
+            </div>
+
+            <div class="faq-item glass-card" data-faq="5">
+                <button class="faq-question" id="faq5Btn">
+                    <span>What audio features does it analyze?</span>
+                    <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+                <div class="faq-answer">
+                    <p>The system extracts 131 audio features across 10 categories: MFCCs (vocal texture), Spectral Centroid (brightness), Spectral Bandwidth (frequency range), Spectral Rolloff (energy distribution), Spectral Contrast (peak/valley differences), Spectral Flatness (noise vs. tone), Zero Crossing Rate (signal dynamics), RMS Energy (loudness), Chroma (pitch content), and Tempo (rhythm). Together, these paint a complete picture of the audio signal.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                        <path d="M14 2L26 8V20L14 26L2 20V8L14 2Z" stroke="url(#footGrad)" stroke-width="2" fill="none"/>
+                        <circle cx="14" cy="14" r="3" fill="url(#footGrad)"/>
+                        <defs>
+                            <linearGradient id="footGrad" x1="2" y1="2" x2="26" y2="26">
+                                <stop offset="0%" stop-color="#00f0ff"/>
+                                <stop offset="100%" stop-color="#7c3aed"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span>DeepVoice<span class="brand-accent">Shield</span></span>
+            </div>
+            <p class="footer-text">Built with AI & Machine Learning — Powered by MFCC Analysis & Random Forest Classification</p>
+            <p class="footer-copy">&copy; 2026 DeepVoiceShield. Educational & Research Purpose.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
