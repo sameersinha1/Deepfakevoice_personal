@@ -1,9 +1,4 @@
-"""
-Training Script for Deepfake Voice Detection Model
-----------------------------------------------------
-Trains a Random Forest classifier using ASVspoof-standard LFCC (Linear Frequency Cepstral Coefficients),
-dynamic MFCCs, and spectral features on genuine human voice vs. modern Neural AI speech (Edge-TTS).
-"""
+
 
 import os
 import sys
