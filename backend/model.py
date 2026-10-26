@@ -1,17 +1,3 @@
-"""
-Deepfake Voice Detection Model
--------------------------------
-State-of-the-art feature extraction for detecting modern Neural AI Voice Deepfakes:
-- LFCCs + Delta + Delta-Delta (Linear Frequency Cepstral Coefficients - ASVspoof Standard)
-- MFCCs + Delta + Delta-Delta (Mel-Frequency Cepstral Coefficients)
-- Spectral Contrast (sub-band energy peak/valley ratio)
-- Spectral Flatness & Rolloff (high-frequency neural vocoder energy distribution)
-- Spectral Centroid & Bandwidth (vocal tract resonance dispersion)
-- Zero Crossing Rate & RMS Energy Dynamics
-- Harmonic Chroma Features
-
-Classifies audio using a calibrated Random Forest Ensemble.
-"""
 
 import os
 import numpy as np
