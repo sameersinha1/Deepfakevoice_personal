@@ -35,6 +35,10 @@ backend/uploads/*
 !backend/uploads/.gitkeep
 *.tmp
 
+# Cache & Large Binary Model Artifacts
+*.npz
+*.keras
+
 # Operating system files
 .DS_Store
 Thumbs.db

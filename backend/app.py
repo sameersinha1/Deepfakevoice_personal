@@ -63,7 +63,11 @@ def health():
     return jsonify({
         "status": "ok",
         "model_loaded": detector.is_loaded,
-        "message": "Deepfake Voice Detection API is running"
+        "model_architecture": "Deep Neural Network (DNN)",
+        "hidden_layers": 7,
+        "forward_propagation_stages": 8,
+        "total_parameters": 396818,
+        "message": "Deepfake Voice Detection Deep Learning API is running"
     })
 
 
@@ -134,8 +138,11 @@ if __name__ == "__main__":
         print("[!] Model not found -- run train_model.py first!")
         print("   python train_model.py")
 
-    print("=" * 50)
-    print("[>] Server running at: http://localhost:5000")
-    print("=" * 50)
+    print("=" * 60)
+    print("[>] OPEN THIS URL IN YOUR BROWSER:")
+    print("    👉 http://localhost:5000")
+    print("    (Note: Browsers block microphone recording on IP addresses like 192.168.x.x)")
+    print("    (Always use http://localhost:5000 to allow microphone permissions)")
+    print("=" * 60)
 
     app.run(host="0.0.0.0", port=5000, debug=False)

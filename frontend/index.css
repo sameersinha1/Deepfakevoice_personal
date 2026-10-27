@@ -866,6 +866,125 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
+/* Deep Neural Network & Forward Propagation Pipeline */
+.dnn-badge-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.dnn-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    background: rgba(0, 240, 255, 0.08);
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent-cyan);
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(8px);
+}
+
+.dnn-pill-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #00f0ff;
+    box-shadow: 0 0 10px #00f0ff;
+    animation: dnnPulse 2s infinite ease-in-out;
+}
+
+@keyframes dnnPulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.forward-propagation-section {
+    border-top: 1px solid var(--border-glass);
+    padding-top: 24px;
+    margin-bottom: 24px;
+}
+
+.forward-stages-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.stage-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-glass);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stage-card:hover {
+    border-color: rgba(0, 240, 255, 0.4);
+    background: rgba(0, 240, 255, 0.03);
+    transform: translateY(-1px);
+}
+
+.stage-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stage-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    letter-spacing: 0.05em;
+    background: rgba(0, 240, 255, 0.1);
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+
+.stage-neurons {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #a78bfa;
+}
+
+.stage-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.stage-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.stage-flow {
+    font-family: monospace;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.stage-act {
+    color: rgba(0, 240, 255, 0.75);
+}
+
+@media (max-width: 640px) {
+    .forward-stages-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ---------- How It Works ---------- */
 .how-section {
     position: relative;

@@ -392,6 +392,23 @@ async function toggleRecording() {
 }
 
 async function startRecording() {
+    // 1. Check if browser environment supports mediaDevices (requires localhost or HTTPS)
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            const localhostUrl = `http://localhost:${window.location.port || 5000}`;
+            statusText.innerHTML = `⚠️ Microphone blocked on IP address. <a href="${localhostUrl}" style="color: #00f0ff; text-decoration: underline; font-weight: bold;">Click to switch to http://localhost:${window.location.port || 5000}</a>`;
+            statusIndicator.className = 'status-indicator';
+            alert(`⚠️ Browser Security Restriction:\n\nModern browsers (Chrome, Edge, Safari) only permit microphone access on 'localhost' or 'HTTPS'.\n\nYou opened: ${window.location.href}\n\nPlease click OK to switch to: ${localhostUrl}`);
+            window.location.href = localhostUrl;
+            return;
+        } else {
+            statusText.textContent = 'Microphone API not supported or disabled in this browser.';
+            statusIndicator.className = 'status-indicator';
+            alert('Your browser does not support or has blocked the microphone recording API. Please test with a modern browser or use the "Upload Audio File" tab.');
+            return;
+        }
+    }
+
     try {
         stream = await navigator.mediaDevices.getUserMedia({
             audio: {
@@ -402,7 +419,12 @@ async function startRecording() {
         });
 
         // Setup Web Audio Context
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        audioContext = new AudioCtx();
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+        }
+
         analyserNode = audioContext.createAnalyser();
         analyserNode.fftSize = 2048;
 
@@ -439,9 +461,18 @@ async function startRecording() {
         }, 1000);
 
     } catch (err) {
-        console.error('Microphone access denied:', err);
-        statusText.textContent = 'Microphone access denied. Please check browser permissions.';
+        console.error('Microphone error:', err);
+        let msg = 'Microphone access denied. Please check browser permissions.';
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            msg = 'Permission denied. Click the lock/settings icon beside the URL in your browser address bar and set Microphone to "Allow".';
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+            msg = 'No microphone detected. Please plug in a microphone or use "Upload Audio File".';
+        } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+            msg = 'Microphone is currently in use by another app. Please close other audio apps and try again.';
+        }
+        statusText.textContent = msg;
         statusIndicator.className = 'status-indicator';
+        alert(`Microphone Error: ${msg}`);
     }
 }
 
@@ -642,6 +673,36 @@ function displayResults(result) {
     }, 300);
     realValue.textContent = `${realProb.toFixed(1)}%`;
     fakeValue.textContent = `${fakeProb.toFixed(1)}%`;
+
+    // Render Deep Learning Forward Propagation Stages
+    const forwardStagesGrid = document.getElementById('forwardStagesGrid');
+    const dnnArchText = document.getElementById('dnnArchText');
+    if (result.deep_learning_model && dnnArchText) {
+        dnnArchText.textContent = `${result.deep_learning_model.architecture || 'Deep Neural Network'} • ${result.deep_learning_model.hidden_layers || 7} Hidden Layers • ${result.deep_learning_model.forward_propagation_stages || 8} Forward Stages`;
+    }
+
+    if (forwardStagesGrid) {
+        forwardStagesGrid.innerHTML = '';
+        if (result.forward_propagation_stages && result.forward_propagation_stages.length > 0) {
+            result.forward_propagation_stages.forEach((stage, i) => {
+                const card = document.createElement('div');
+                card.className = 'stage-card';
+                card.style.animation = `slideUp 0.4s ease forwards ${i * 0.06}s`;
+                card.innerHTML = `
+                    <div class="stage-card-header">
+                        <span class="stage-badge">Stage ${stage.stage}</span>
+                        <span class="stage-neurons">${stage.neurons} neurons</span>
+                    </div>
+                    <div class="stage-name">${stage.name}</div>
+                    <div class="stage-meta">
+                        <span class="stage-flow">${stage.flow}</span>
+                        <span class="stage-act">${stage.activation}</span>
+                    </div>
+                `;
+                forwardStagesGrid.appendChild(card);
+            });
+        }
+    }
 
     // Feature breakdown chips
     featureGrid.innerHTML = '';
