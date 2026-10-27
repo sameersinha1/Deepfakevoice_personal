@@ -412,9 +412,10 @@ async function startRecording() {
     try {
         stream = await navigator.mediaDevices.getUserMedia({
             audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true,
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false,
+                channelCount: 1,
             }
         });
 
@@ -520,9 +521,8 @@ function stopRecording() {
 
     updateUI('analyzing');
 
-    // Downsample to 16kHz for model
-    const downsampled = downsampleBuffer(mergedSamples, sampleRate, 16000);
-    const wavBlob = encodeWAV(downsampled, 16000);
+    // Send uncompressed native audio (backend uses librosa sinc anti-aliased 16kHz resampling)
+    const wavBlob = encodeWAV(mergedSamples, sampleRate);
 
     // Send WAV audio to backend
     sendAudioForPrediction(wavBlob);

@@ -445,9 +445,9 @@ class DeepfakeDetector:
         fake_prob = round(float(proba[0]) * 100, 1) if len(proba) > 1 else 0
         real_prob = round(float(proba[1]) * 100, 1) if len(proba) > 1 else 0
 
-        # Calibrated anti-spoofing decision threshold:
-        # If Fake probability is >= 40.0%, classify as Fake (protects against subtle/compressed AI voices)
-        is_fake = (fake_prob >= 40.0)
+        # Balanced decision threshold:
+        # A voice is classified as Fake only if Fake probability strictly exceeds Real probability
+        is_fake = (fake_prob > 50.0)
         label = "Fake" if is_fake else "Real"
         confidence = fake_prob if is_fake else real_prob
 
