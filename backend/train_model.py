@@ -67,12 +67,17 @@ def load_dataset():
     uploads_temp = os.path.join(BASE_DIR, "uploads")
     os.makedirs(uploads_temp, exist_ok=True)
 
-    real_files = sorted([f for f in os.listdir(REAL_DIR) if f.endswith(('.wav', '.flac', '.mp3', '.ogg'))])
-    fake_files = sorted([f for f in os.listdir(FAKE_DIR) if f.endswith(('.wav', '.flac', '.mp3', '.ogg'))])
+    import glob
+    real_paths = sorted(glob.glob(os.path.join(REAL_DIR, "*.*")) + 
+                        glob.glob(os.path.join(DATA_DIR, "synthetic", "real", "*.*")))
+    fake_paths = sorted(glob.glob(os.path.join(FAKE_DIR, "*.*")) + 
+                        glob.glob(os.path.join(DATA_DIR, "synthetic", "fake", "*.*")))
 
-    print(f"\n[DIR] Processing {len(real_files)} Real human audio files...")
-    for i, fname in enumerate(real_files):
-        fpath = os.path.join(REAL_DIR, fname)
+    real_paths = [p for p in real_paths if p.endswith(('.wav', '.flac', '.mp3', '.ogg', '.m4a'))]
+    fake_paths = [p for p in fake_paths if p.endswith(('.wav', '.flac', '.mp3', '.ogg', '.m4a'))]
+
+    print(f"\n[DIR] Processing {len(real_paths)} Real human audio files (FLAC + WAV)...")
+    for i, fpath in enumerate(real_paths):
         feat = extract_features(fpath)
         if feat is not None:
             X.append(feat)
@@ -93,12 +98,11 @@ def load_dataset():
         except Exception:
             pass
 
-        if (i + 1) % 25 == 0:
-            print(f"   Processed {i + 1}/{len(real_files)} real files", flush=True)
+        if (i + 1) % 50 == 0:
+            print(f"   Processed {i + 1}/{len(real_paths)} real files", flush=True)
 
-    print(f"\n[DIR] Processing {len(fake_files)} Neural AI Fake audio files...")
-    for i, fname in enumerate(fake_files):
-        fpath = os.path.join(FAKE_DIR, fname)
+    print(f"\n[DIR] Processing {len(fake_paths)} Neural AI Fake audio files (MP3 + WAV)...")
+    for i, fpath in enumerate(fake_paths):
         feat = extract_features(fpath)
         if feat is not None:
             X.append(feat)
@@ -119,8 +123,8 @@ def load_dataset():
         except Exception:
             pass
 
-        if (i + 1) % 25 == 0:
-            print(f"   Processed {i + 1}/{len(fake_files)} fake files", flush=True)
+        if (i + 1) % 50 == 0:
+            print(f"   Processed {i + 1}/{len(fake_paths)} fake files", flush=True)
 
     X_arr = np.array(X, dtype=np.float32)
     y_arr = np.array(y, dtype=np.int32)

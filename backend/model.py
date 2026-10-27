@@ -112,6 +112,12 @@ def extract_features(file_path, sr=16000):
         if len(y) < sr:
             y = np.pad(y, (0, sr - len(y)), mode='constant')
 
+        # Voice Activity Detection (VAD) / Silence Gate
+        peak_amp = float(np.max(np.abs(y)))
+        rms_val = float(np.sqrt(np.mean(y ** 2)))
+        if peak_amp < 0.005 or rms_val < 0.001:
+            return None
+
         y = librosa.util.normalize(y)
         features = []
 
@@ -407,9 +413,14 @@ class DeepfakeDetector:
         features = extract_features(file_path)
         if features is None:
             return {
-                "error": "Could not extract features from audio file.",
-                "label": "Unknown",
-                "confidence": 0
+                "error": "No audible voice activity detected. The audio is silent or too quiet. Please speak into the microphone.",
+                "label": "Silence / No Speech",
+                "confidence": 0,
+                "real_probability": 0,
+                "fake_probability": 0,
+                "features_analyzed": [],
+                "forward_propagation_stages": [],
+                "deep_learning_model": {"architecture": "Deep Neural Network (DNN)"}
             }
 
         features_scaled = self.scaler.transform(features.reshape(1, -1))
@@ -418,7 +429,6 @@ class DeepfakeDetector:
         if isinstance(self.model, DeepVoiceNeuralNetwork):
             probs, stages = self.model.forward(features_scaled)
             proba = probs[0]
-            prediction = int(np.argmax(proba))
             feature_scores = self.model.compute_feature_attributions(features_scaled[0])
             model_info = {
                 "architecture": "Deep Neural Network (DNN)",
@@ -428,20 +438,24 @@ class DeepfakeDetector:
             }
         else:
             proba = self.model.predict_proba(features_scaled)[0]
-            prediction = int(self.model.predict(features_scaled)[0])
             feature_scores = []
             stages = []
             model_info = {"architecture": "Ensemble Classifier"}
 
-        # Label: 1=Real human voice, 0=Synthetic/Deepfake AI voice
-        label = "Real" if prediction == 1 else "Fake"
-        confidence = float(max(proba) * 100)
+        fake_prob = round(float(proba[0]) * 100, 1) if len(proba) > 1 else 0
+        real_prob = round(float(proba[1]) * 100, 1) if len(proba) > 1 else 0
+
+        # Calibrated anti-spoofing decision threshold:
+        # If Fake probability is >= 40.0%, classify as Fake (protects against subtle/compressed AI voices)
+        is_fake = (fake_prob >= 40.0)
+        label = "Fake" if is_fake else "Real"
+        confidence = fake_prob if is_fake else real_prob
 
         return {
             "label": label,
             "confidence": round(confidence, 1),
-            "real_probability": round(float(proba[1]) * 100, 1) if len(proba) > 1 else 0,
-            "fake_probability": round(float(proba[0]) * 100, 1) if len(proba) > 1 else 0,
+            "real_probability": real_prob,
+            "fake_probability": fake_prob,
             "features_analyzed": feature_scores[:6] if feature_scores else [],
             "forward_propagation_stages": stages,
             "deep_learning_model": model_info,
