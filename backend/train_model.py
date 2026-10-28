@@ -50,9 +50,9 @@ def augment_reverb(y, sr=16000):
 
 
 def augment_mic_filter(y, sr=16000):
-    """Simulate laptop/phone microphone frequency response."""
-    low_cut = np.random.uniform(100, 180) / (sr / 2)
-    high_cut = np.random.uniform(6600, 7600) / (sr / 2)
+    """Simulate phone/laptop speaker/mic frequency response spanning 3600-6800Hz."""
+    low_cut = np.random.uniform(100, 250) / (sr / 2)
+    high_cut = np.random.uniform(3600, 6800) / (sr / 2)
     b_l, a_l = butter(2, low_cut, btype='high')
     b_h, a_h = butter(2, high_cut, btype='low')
     y_filt = lfilter(b_l, a_l, y)

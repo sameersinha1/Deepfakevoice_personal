@@ -109,14 +109,22 @@ def extract_features(file_path, sr=16000):
     try:
         y, sr = librosa.load(file_path, sr=sr, mono=True)
 
-        if len(y) < sr:
-            y = np.pad(y, (0, sr - len(y)), mode='constant')
-
         # Voice Activity Detection (VAD) / Silence Gate
-        peak_amp = float(np.max(np.abs(y)))
-        rms_val = float(np.sqrt(np.mean(y ** 2)))
+        peak_amp = float(np.max(np.abs(y))) if len(y) > 0 else 0.0
+        rms_val = float(np.sqrt(np.mean(y ** 2))) if len(y) > 0 else 0.0
         if peak_amp < 0.005 or rms_val < 0.001:
             return None
+
+        # Trim leading and trailing microphone idle silence
+        try:
+            y_trim, _ = librosa.effects.trim(y, top_db=20)
+            if len(y_trim) >= sr * 0.4:
+                y = y_trim
+        except Exception:
+            pass
+
+        if len(y) < sr:
+            y = np.pad(y, (0, sr - len(y)), mode='constant')
 
         y = librosa.util.normalize(y)
         features = []
