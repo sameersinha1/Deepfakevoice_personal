@@ -442,7 +442,11 @@ async function startRecording() {
         };
 
         sourceNode.connect(scriptProcessor);
-        scriptProcessor.connect(audioContext.destination);
+        // Connect through silent gain node to prevent speaker feedback loop into microphone
+        const muteGain = audioContext.createGain();
+        muteGain.gain.value = 0;
+        scriptProcessor.connect(muteGain);
+        muteGain.connect(audioContext.destination);
 
         isRecording = true;
         recordSeconds = 0;
@@ -535,7 +539,8 @@ async function sendAudioForPrediction(blob) {
     showAnalyzingSteps();
 
     const formData = new FormData();
-    formData.append('audio', blob, 'recording.wav');
+    const fileName = (blob instanceof File && blob.name) ? blob.name : 'recording.wav';
+    formData.append('audio', blob, fileName);
 
     try {
         const response = await fetch(`${API_BASE}/api/predict`, {
